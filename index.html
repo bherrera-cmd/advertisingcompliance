@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EMCD — Ad Compliance</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0a0f;
+  --surface: #13131a;
+  --surface2: #1a1a24;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.12);
+  --text: #e8e8f0;
+  --muted: #6b6b80;
+  --muted2: #9494a8;
+  --accent: #7c6af7;
+  --accent2: #a594ff;
+  --yes: #22c55e;
+  --yes-bg: rgba(34,197,94,0.10);
+  --yes-border: rgba(34,197,94,0.25);
+  --no: #ef4444;
+  --no-bg: rgba(239,68,68,0.10);
+  --no-border: rgba(239,68,68,0.25);
+  --cond: #f59e0b;
+  --cond-bg: rgba(245,158,11,0.10);
+  --cond-border: rgba(245,158,11,0.25);
+  --ncov: #6b7280;
+  --ncov-bg: rgba(107,114,128,0.10);
+  --ncov-border: rgba(107,114,128,0.20);
+  --meta-c: #1877f2;
+  --x-c: #e7e7e7;
+  --google-c: #ea4335;
+  --tg-c: #26a5e4;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Sora', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* ── Layout ─────────────────────────────────────────────── */
+.shell { display: flex; min-height: 100vh; }
+
+/* ── Sidebar ────────────────────────────────────────────── */
+.sidebar {
+  width: 220px;
+  flex-shrink: 0;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  padding: 0;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.logo {
+  padding: 28px 20px 20px;
+  border-bottom: 1px solid var(--border);
+}
+.logo-tag {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 4px;
+}
+.logo-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.2;
+}
+
+.nav { padding: 12px 0; flex: 1; }
+
+.nav-section-label {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 14px 20px 6px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 20px;
+  cursor: pointer;
+  border-left: 2px solid transparent;
+  transition: all 0.15s;
+  font-size: 13px;
+  color: var(--muted2);
+  font-weight: 400;
+}
+.nav-item:hover { color: var(--text); background: rgba(255,255,255,0.03); }
+.nav-item.active {
+  color: var(--text);
+  border-left-color: var(--accent);
+  background: rgba(124,106,247,0.08);
+  font-weight: 500;
+}
+.nav-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.dot-home { background: var(--accent); }
+.dot-meta { background: var(--meta-c); }
+.dot-x { background: var(--x-c); }
+.dot-google { background: var(--google-c); }
+.dot-tg { background: var(--tg-c); }
+
+.sidebar-footer {
+  padding: 16px 20px;
+  border-top: 1px solid var(--border);
+  font-size: 10px;
+  color: var(--muted);
+}
+
+/* ── Main ───────────────────────────────────────────────── */
+.main { flex: 1; overflow-x: hidden; }
+
+/* ── Page header ─────────────────────────────────────────── */
+.page-header {
+  padding: 40px 48px 32px;
+  border-bottom: 1px solid var(--border);
+  position: relative;
+}
+.page-header::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, var(--accent), transparent);
+}
+.page-eyebrow {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 10px;
+}
+.page-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.2;
+  margin-bottom: 6px;
+}
+.page-sub {
+  font-size: 13px;
+  color: var(--muted2);
+}
+
+/* ── Content ─────────────────────────────────────────────── */
+.content { padding: 36px 48px; }
+
+/* ── Section titles ─────────────────────────────────────── */
+.section-title {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.section-title::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* ── Legend pills ─────────────────────────────────────────── */
+.legend { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 36px; }
+.legend-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-size: 12px;
+}
+.legend-item.yes { background: var(--yes-bg); border: 1px solid var(--yes-border); }
+.legend-item.no  { background: var(--no-bg);  border: 1px solid var(--no-border); }
+.legend-item.cond{ background: var(--cond-bg);border: 1px solid var(--cond-border);}
+.legend-item.ncov{ background: var(--ncov-bg);border: 1px solid var(--ncov-border);}
+.legend-badge { font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 500; }
+.legend-badge.yes { color: var(--yes); }
+.legend-badge.no  { color: var(--no); }
+.legend-badge.cond{ color: var(--cond); }
+.legend-badge.ncov{ color: var(--ncov); }
+.legend-desc { color: var(--muted2); }
+
+/* ── Key rules ───────────────────────────────────────────── */
+.rules-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 32px;
+}
+.rule-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px 18px;
+}
+.rule-card.full { grid-column: 1 / -1; }
+.rule-key {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent2);
+  margin-bottom: 5px;
+  letter-spacing: 0.02em;
+}
+.rule-val {
+  font-size: 12px;
+  color: var(--muted2);
+  line-height: 1.65;
+}
+.rules-section-header {
+  grid-column: 1 / -1;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: var(--text);
+  padding: 14px 0 4px;
+  border-top: 1px solid var(--border);
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ── Platform page ───────────────────────────────────────── */
+.platform-header {
+  display: flex; align-items: center; gap: 14px;
+  margin-bottom: 28px;
+}
+.platform-icon {
+  width: 40px; height: 40px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+}
+.platform-icon.meta   { background: rgba(24,119,242,0.15); }
+.platform-icon.x      { background: rgba(231,231,231,0.10); }
+.platform-icon.google { background: rgba(234,67,53,0.15); }
+.platform-icon.tg     { background: rgba(38,165,228,0.15); }
+
+.platform-name { font-size: 22px; font-weight: 700; }
+.platform-name.meta   { color: var(--meta-c); }
+.platform-name.x      { color: var(--x-c); }
+.platform-name.google { color: var(--google-c); }
+.platform-name.tg     { color: var(--tg-c); }
+
+/* ── Filters ─────────────────────────────────────────────── */
+.filters {
+  display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px;
+}
+.filter-btn {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid var(--border2);
+  background: transparent;
+  color: var(--muted2);
+  transition: all 0.15s;
+  font-family: 'Sora', sans-serif;
+}
+.filter-btn:hover { border-color: var(--accent); color: var(--text); }
+.filter-btn.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+/* ── Product blocks ──────────────────────────────────────── */
+.product-block {
+  margin-bottom: 8px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--surface);
+}
+.product-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 18px;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.15s;
+}
+.product-header:hover { background: var(--surface2); }
+.product-header-left { display: flex; align-items: center; gap: 12px; }
+.product-name { font-size: 13px; font-weight: 600; color: var(--text); }
+.product-chevron {
+  font-size: 12px;
+  color: var(--muted);
+  transition: transform 0.2s;
+}
+.product-block.open .product-chevron { transform: rotate(180deg); }
+
+.product-stats {
+  display: flex; gap: 6px;
+}
+.stat-pill {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  font-weight: 500;
+  padding: 2px 7px;
+  border-radius: 4px;
+}
+.stat-pill.yes  { color: var(--yes);  background: var(--yes-bg);  border: 1px solid var(--yes-border); }
+.stat-pill.no   { color: var(--no);   background: var(--no-bg);   border: 1px solid var(--no-border); }
+.stat-pill.cond { color: var(--cond); background: var(--cond-bg); border: 1px solid var(--cond-border); }
+.stat-pill.ncov { color: var(--ncov); background: var(--ncov-bg); border: 1px solid var(--ncov-border); font-size: 9px; }
+
+/* ── Country table ───────────────────────────────────────── */
+.product-body { display: none; border-top: 1px solid var(--border); }
+.product-block.open .product-body { display: block; }
+
+.country-table { width: 100%; border-collapse: collapse; }
+.country-table th {
+  text-align: left;
+  padding: 10px 18px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  background: rgba(0,0,0,0.2);
+  border-bottom: 1px solid var(--border);
+}
+.country-table tr:not(:last-child) td { border-bottom: 1px solid var(--border); }
+.country-table td {
+  padding: 12px 18px;
+  vertical-align: top;
+}
+.country-table tr:hover td { background: rgba(255,255,255,0.015); }
+
+.country-name {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text);
+  white-space: nowrap;
+  min-width: 110px;
+}
+
+.status-badge {
+  display: inline-block;
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  font-weight: 500;
+  padding: 3px 9px;
+  border-radius: 5px;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+.status-badge.YES  { color: var(--yes);  background: var(--yes-bg);  border: 1px solid var(--yes-border); }
+.status-badge.NO   { color: var(--no);   background: var(--no-bg);   border: 1px solid var(--no-border); }
+.status-badge.COND { color: var(--cond); background: var(--cond-bg); border: 1px solid var(--cond-border); }
+.status-badge.ncov { color: var(--ncov); background: var(--ncov-bg); border: 1px solid var(--ncov-border); font-size: 9px; padding: 3px 6px; }
+
+.note-text {
+  font-size: 11px;
+  color: var(--muted2);
+  line-height: 1.6;
+  max-width: 480px;
+}
+.note-gen {
+  font-size: 11px;
+  color: var(--muted);
+  font-style: italic;
+  margin-top: 3px;
+}
+
+/* ── Home overview table ─────────────────────────────────── */
+.overview-table-wrap { overflow-x: auto; margin-bottom: 32px; }
+.overview-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+.overview-table th {
+  text-align: center;
+  padding: 10px 12px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  background: rgba(0,0,0,0.2);
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+.overview-table th:first-child { text-align: left; }
+.overview-table th:nth-child(2) { text-align: left; }
+.overview-table td {
+  padding: 9px 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  vertical-align: middle;
+  text-align: center;
+}
+.overview-table td:first-child { text-align: left; font-weight: 600; font-size: 11px; color: var(--accent2); white-space: nowrap; }
+.overview-table td:nth-child(2) { text-align: left; color: var(--muted2); white-space: nowrap; }
+.overview-table tbody tr:hover td { background: rgba(255,255,255,0.015); }
+.ov-prod-row td:first-child { color: var(--text); font-size: 12px; }
+
+/* ── Page visibility ─────────────────────────────────────── */
+.page { display: none; }
+.page.active { display: block; }
+
+/* ── Scrollbar ───────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+<!-- ── SIDEBAR ───────────────────────────────────────────── -->
+<aside class="sidebar">
+  <div class="logo">
+    <div class="logo-tag">EMCD Marketing</div>
+    <div class="logo-title">Ad Compliance<br>Matrix</div>
+  </div>
+
+  <nav class="nav">
+    <div class="nav-section-label">Overview</div>
+    <div class="nav-item active" onclick="showPage('home', this)">
+      <span class="nav-dot dot-home"></span> Home & Key Rules
+    </div>
+
+    <div class="nav-section-label">By Platform</div>
+    <div class="nav-item" onclick="showPage('meta', this)">
+      <span class="nav-dot dot-meta"></span> Meta
+    </div>
+    <div class="nav-item" onclick="showPage('x', this)">
+      <span class="nav-dot dot-x"></span> X (Twitter)
+    </div>
+    <div class="nav-item" onclick="showPage('google', this)">
+      <span class="nav-dot dot-google"></span> Google Ads
+    </div>
+    <div class="nav-item" onclick="showPage('tg', this)">
+      <span class="nav-dot dot-tg"></span> Telegram Ads
+    </div>
+  </nav>
+
+  <div class="sidebar-footer">
+    April 2026 · Confidential
+  </div>
+</aside>
+
+<!-- ── MAIN ──────────────────────────────────────────────── -->
+<main class="main">
+
+  <!-- HOME PAGE -->
+  <div id="page-home" class="page active">
+    <div class="page-header">
+      <div class="page-eyebrow">EMCD · Advertising Compliance</div>
+      <div class="page-title">Key Rules &amp; Platform Logic</div>
+      <div class="page-sub">Based on official platform policies + EMCD legal guidance · April 2026</div>
+    </div>
+    <div class="content">
+
+      <div class="section-title">Status legend</div>
+      <div class="legend">
+        <div class="legend-item yes"><span class="legend-badge yes">YES</span><span class="legend-desc">Allowed — platform permits without special gating</span></div>
+        <div class="legend-item no"><span class="legend-badge no">NO</span><span class="legend-desc">Not allowed — blocked, licence missing, or globally prohibited</span></div>
+        <div class="legend-item cond"><span class="legend-badge cond">COND</span><span class="legend-desc">Conditional — allowed only with licence, cert, bridge landing, or restrictions</span></div>
+
+      </div>
+
+      <div class="section-title">Key rules by platform</div>
+      <div id="rules-container"></div>
+
+    </div>
+  </div>
+
+  <!-- PLATFORM PAGES (meta, x, google, tg) -->
+  <div id="page-meta"   class="page"></div>
+  <div id="page-x"     class="page"></div>
+  <div id="page-google" class="page"></div>
+  <div id="page-tg"    class="page"></div>
+
+</main>
+</div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────────────────────
+const DATA = [{"product": "Engaging", "country": "Russia", "meta": "NO", "x": "NO", "google": "NO", "tg": "YES", "n_meta": "blocked in RU (law since Mar 2022)", "n_x": "Russia EXCLUDED (*) from crypto/financial ads per X policy", "n_google": "suspended in RU (Mar 2022)", "n_tg": "allowed, primary CIS channel", "n_gen": ""}, {"product": "Engaging", "country": "Kazakhstan", "meta": "YES", "x": "YES", "google": "YES", "tg": "YES", "n_meta": "", "n_x": "", "n_google": "", "n_tg": "", "n_gen": "Brand content — no licence needed. All platforms: allowed with general ad policies"}, {"product": "Engaging", "country": "Turkey", "meta": "YES", "x": "YES", "google": "YES", "tg": "YES", "n_meta": "", "n_x": "", "n_google": "", "n_tg": "", "n_gen": "Brand content allowed. Turkey is on X and Google approved list"}, {"product": "Engaging", "country": "Argentina", "meta": "YES", "x": "YES", "google": "YES", "tg": "YES", "n_meta": "", "n_x": "", "n_google": "", "n_tg": "", "n_gen": "Brand/awareness content: no financial licence needed"}, {"product": "Engaging", "country": "Brazil", "meta": "YES", "x": "YES", "google": "YES", "tg": "YES", "n_meta": "", "n_x": "", "n_google": "", "n_tg": "", "n_gen": "Brand content allowed. No financial claims"}, {"product": "Engaging", "country": "Germany", "meta": "YES", "x": "YES", "google": "YES", "tg": "YES", "n_meta": "", "n_x": "", "n_google": "", "n_tg": "", "n_gen": "Brand/awareness only (no product CTA). All platforms allow educational/brand content without crypto licence"}, {"product": "Engaging", "country": "Austria", "meta": "YES", "x": "YES", "google": "YES", "tg": "YES", "n_meta": "", "n_x": "", "n_google": "", "n_tg": "", "n_gen": "Brand/awareness only. All platforms allow without licence"}, {"product": "Engaging", "country": "Switzerland", "meta": "YES", "x": "YES", "google": "YES", "tg": "YES", "n_meta": "", "n_x": "", "n_google": "", "n_tg": "", "n_gen": "Brand/awareness only. All platforms allow without licence"}, {"product": "Engaging", "country": "Netherlands", "meta": "YES", "x": "YES", "google": "YES", "tg": "YES", "n_meta": "", "n_x": "", "n_google": "", "n_tg": "", "n_gen": "Brand/awareness only. All platforms allow without licence"}, {"product": "Educational", "country": "Russia", "meta": "NO", "x": "NO", "google": "NO", "tg": "YES", "n_meta": "blocked", "n_x": "Russia excluded from ads", "n_google": "suspended", "n_tg": "educational content fully allowed, main channel", "n_gen": ""}, {"product": "Educational", "country": "Kazakhstan", "meta": "YES", "x": "YES", "google": "YES", "tg": "YES", "n_meta": "", "n_x": "", "n_google": "", "n_tg": "", "n_gen": "Educational blockchain/crypto content: no licence required on any platform"}, {"product": "Educational", "country": "Turkey", "meta": "YES", "x": "YES", "google": "YES", "tg": "YES", "n_meta": "", "n_x": "", "n_google": "", "n_tg": "", "n_gen": "Educational content: no licence required"}, {"product": "Educational", "country": "Argentina", "meta": "YES", "x": "YES", "google": "YES", "tg": "YES", "n_meta": "", "n_x": "", "n_google": "", "n_tg": "", "n_gen": "Educational content: allowed. No product offer or registration CTAs"}, {"product": "Educational", "country": "Brazil", "meta": "YES", "x": "YES", "google": "YES", "tg": "YES", "n_meta": "", "n_x": "", "n_google": "", "n_tg": "", "n_gen": "Educational content: allowed. CVM permits educational posts without restrictions"}, {"product": "Educational", "country": "Germany", "meta": "YES", "x": "YES", "google": "YES", "tg": "YES", "n_meta": "", "n_x": "", "n_google": "", "n_tg": "", "n_gen": "Educational/tech content: explicitly allowed on ALL platforms without licence. No product CTA"}, {"product": "Educational", "country": "Austria", "meta": "YES", "x": "YES", "google": "YES", "tg": "YES", "n_meta": "", "n_x": "", "n_google": "", "n_tg": "", "n_gen": "Educational content: allowed on all platforms without licence"}, {"product": "Educational", "country": "Switzerland", "meta": "YES", "x": "YES", "google": "YES", "tg": "YES", "n_meta": "", "n_x": "", "n_google": "", "n_tg": "", "n_gen": "Educational content: allowed without licence"}, {"product": "Educational", "country": "Netherlands", "meta": "YES", "x": "YES", "google": "YES", "tg": "YES", "n_meta": "", "n_x": "", "n_google": "", "n_tg": "", "n_gen": "Educational content: allowed without licence. EN language only for X/Telegram"}, {"product": "Partnership / Listing", "country": "Russia", "meta": "NO", "x": "NO", "google": "NO", "tg": "YES", "n_meta": "blocked", "n_x": "Russia excluded", "n_google": "suspended", "n_tg": "announcements fully allowed", "n_gen": ""}, {"product": "Partnership / Listing", "country": "Kazakhstan", "meta": "YES", "x": "YES", "google": "YES", "tg": "YES", "n_meta": "", "n_x": "", "n_google": "", "n_tg": "", "n_gen": "Partnership/listing announcements: no financial licence needed"}, {"product": "Partnership / Listing", "country": "Turkey", "meta": "YES", "x": "YES", "google": "YES", "tg": "YES", "n_meta": "", "n_x": "", "n_google": "", "n_tg": "", "n_gen": "Allowed. No guaranteed return claims"}, {"product": "Partnership / Listing", "country": "Argentina", "meta": "YES", "x": "YES", "google": "YES", "tg": "YES", "n_meta": "", "n_x": "", "n_google": "", "n_tg": "", "n_gen": "Neutral collab/listing content. No financial promises"}, {"product": "Partnership / Listing", "country": "Brazil", "meta": "YES", "x": "YES", "google": "YES", "tg": "YES", "n_meta": "", "n_x": "", "n_google": "", "n_tg": "", "n_gen": "Collab/listing content. No financial guarantees"}, {"product": "Partnership / Listing", "country": "Germany", "meta": "YES", "x": "YES", "google": "YES", "tg": "YES", "n_meta": "", "n_x": "", "n_google": "", "n_tg": "", "n_gen": "Brand collab/listing: allowed without crypto licence. No financial product CTAs"}, {"product": "Partnership / Listing", "country": "Austria", "meta": "YES", "x": "YES", "google": "YES", "tg": "YES", "n_meta": "", "n_x": "", "n_google": "", "n_tg": "", "n_gen": "Brand collab/listing: allowed without licence. No financial product CTAs"}, {"product": "Partnership / Listing", "country": "Switzerland", "meta": "YES", "x": "YES", "google": "YES", "tg": "YES", "n_meta": "", "n_x": "", "n_google": "", "n_tg": "", "n_gen": "Brand collab/listing: allowed without licence"}, {"product": "Partnership / Listing", "country": "Netherlands", "meta": "YES", "x": "YES", "google": "YES", "tg": "YES", "n_meta": "", "n_x": "", "n_google": "", "n_tg": "", "n_gen": "Brand collab/listing: allowed without licence. EN language preferred"}, {"product": "Mining", "country": "Russia", "meta": "NO", "x": "NO", "google": "NO", "tg": "YES", "n_meta": "blocked", "n_x": "Russia EXCLUDED + mining hardware/software PROHIBITED on X", "n_google": "suspended", "n_tg": "core CIS audience; tech framing, no ROI", "n_gen": ""}, {"product": "Mining", "country": "Kazakhstan", "meta": "COND", "x": "NO", "google": "COND", "tg": "YES", "n_meta": "needs licence (KZ not in accepted list → risky)", "n_x": "cryptocurrency mining GLOBALLY PROHIBITED on X", "n_google": "allowed as tech service. | COND — certification/registration required per Google Ads crypto policy", "n_tg": "core market", "n_gen": ""}, {"product": "Mining", "country": "USA", "meta": "COND", "x": "NO", "google": "COND", "tg": "COND", "n_meta": "needs licence", "n_x": "cryptocurrency mining GLOBALLY PROHIBITED on X", "n_google": "certification needed. No ROI/income claims", "n_tg": "", "n_gen": ""}, {"product": "Mining", "country": "Canada", "meta": "COND", "x": "NO", "google": "COND", "tg": "COND", "n_meta": "FINTRAC registration needed", "n_x": "cryptocurrency mining GLOBALLY PROHIBITED on X", "n_google": "needs certification. No ROI", "n_tg": "", "n_gen": ""}, {"product": "Mining", "country": "Germany", "meta": "NO", "x": "NO", "google": "NO", "tg": "COND", "n_meta": "DE not in accepted licence list → NO", "n_x": "X policy: 'cryptocurrency mining including hardware and software services associated with mining' is globally prohibited on X. Mining pool software falls under this prohibition. Status is NO — no conditional exception exists", "n_google": "EU needs CASP (MiCA, Apr 2025) → NO without CASP", "n_tg": "tech framing, no income claims", "n_gen": ""}, {"product": "Mining", "country": "Austria", "meta": "COND", "x": "NO", "google": "NO", "tg": "COND", "n_meta": "FMA licence accepted → COND if FMA held", "n_x": "X policy explicitly prohibits 'cryptocurrency mining including hardware and software services associated with mining' globally, with no exceptions by country or licence. Status is NO — there is no conditional exception for pool software or 'tech framing'", "n_google": "EU CASP needed → NO without CASP", "n_tg": "tech framing", "n_gen": ""}, {"product": "Mining", "country": "Switzerland", "meta": "COND", "x": "NO", "google": "COND", "tg": "COND", "n_meta": "FINMA licence accepted → COND if FINMA held", "n_x": "X policy explicitly prohibits 'cryptocurrency mining including hardware and software services associated with mining' globally, with no exceptions by country or licence. Status is NO — there is no conditional exception for pool software or 'tech framing'", "n_google": "FINMA + Google cert needed → COND", "n_tg": "tech framing", "n_gen": ""}, {"product": "Mining", "country": "Netherlands", "meta": "COND", "x": "NO", "google": "NO", "tg": "COND", "n_meta": "DNB registration accepted → COND if DNB held", "n_x": "X policy explicitly prohibits 'cryptocurrency mining including hardware and software services associated with mining' globally, with no exceptions by country or licence. Status is NO — there is no conditional exception for pool software or 'tech framing'", "n_google": "EU CASP (MiCA) needed → NO without CASP", "n_tg": "tech framing; no income claims", "n_gen": ""}, {"product": "Coinhold", "country": "Russia", "meta": "NO", "x": "NO", "google": "NO", "tg": "YES", "n_meta": "blocked", "n_x": "Russia excluded", "n_google": "suspended", "n_tg": "'variable rewards', no guaranteed yield, conditional language", "n_gen": ""}, {"product": "Coinhold", "country": "Kazakhstan", "meta": "COND", "x": "not covered in source documents", "google": "not covered in source documents", "tg": "YES", "n_meta": "no KZ licence in accepted list → risky, COND", "n_x": "Kazakhstan not in X allowed-country list for regulated crypto products. No source supports a COND status", "n_google": "No source confirms Kazakhstan is in Google's approved country list for Coinhold-type crypto products. Cannot support COND", "n_tg": "'variable rewards' framing; no guaranteed yield", "n_gen": ""}, {"product": "Coinhold", "country": "Turkey", "meta": "COND", "x": "COND", "google": "COND", "tg": "YES", "n_meta": "COND with framing", "n_x": "Turkey on allowed list, COND with licence", "n_google": "COND", "n_tg": "'variable rewards'; no banking terms", "n_gen": ""}, {"product": "Coinhold", "country": "Argentina", "meta": "NO", "x": "COND", "google": "COND", "tg": "YES", "n_meta": "AR not in accepted licence list + yield product → NO", "n_x": "AR on allowed list → COND; no ROI/%", "n_google": "COND (AR on approved list, needs Google cert)", "n_tg": "'variable rewards', no APY", "n_gen": ""}, {"product": "Coinhold", "country": "Brazil", "meta": "NO", "x": "COND", "google": "COND", "tg": "YES", "n_meta": "BR not in accepted licence list for yield products → NO", "n_x": "BR on allowed list → COND; no 'renda fixa/juros'", "n_google": "COND (BR approved, needs cert)", "n_tg": "'variable rewards'", "n_gen": ""}, {"product": "Coinhold", "country": "Germany", "meta": "NO", "x": "NO", "google": "NO", "tg": "NO", "n_meta": "DE not in accepted licence list → NO", "n_x": "staking requires licence; DE on list but without CASP/BaFin licence = NO", "n_google": "EU CASP required (MiCA) → NO without CASP", "n_tg": "COND — no yield claims, EN only", "n_gen": ""}, {"product": "Coinhold", "country": "Austria", "meta": "COND", "x": "NO", "google": "NO", "tg": "COND", "n_meta": "FMA licence accepted → COND (if FMA held)", "n_x": "AT on list but staking needs licence; without licence = NO", "n_google": "EU CASP required → NO without CASP", "n_tg": "COND — no yield claims", "n_gen": ""}, {"product": "Coinhold", "country": "Switzerland", "meta": "COND", "x": "NO", "google": "NO", "tg": "COND", "n_meta": "FINMA licence accepted → COND (if FINMA held)", "n_x": "CH on list but staking needs FINMA → NO without it", "n_google": "FINMA + Google cert needed → NO without FINMA", "n_tg": "COND — no yield/ROI", "n_gen": ""}, {"product": "Coinhold", "country": "Netherlands", "meta": "COND", "x": "NO", "google": "NO", "tg": "COND", "n_meta": "DNB registration accepted → COND (if DNB held)", "n_x": "NL on list but staking needs DNB licence → NO without it", "n_google": "EU CASP needed → NO", "n_tg": "COND — no yield claims, EN only", "n_gen": ""}, {"product": "Cards", "country": "Russia", "meta": "NO", "x": "NO", "google": "NO", "tg": "YES", "n_meta": "blocked", "n_x": "Russia excluded from financial ads", "n_google": "suspended", "n_tg": "'spend crypto globally', spending framing", "n_gen": ""}, {"product": "Cards", "country": "Kazakhstan", "meta": "COND", "x": "NO", "google": "not covered in source documents", "tg": "YES", "n_meta": "COND with careful framing (KZ not specifically listed)", "n_x": "Kazakhstan not in X allowed-country list for regulated crypto card advertising per X Financial Services policy", "n_google": "No source confirms Kazakhstan is in Google's approved country list for crypto card advertising. Cannot support COND", "n_tg": "", "n_gen": ""}, {"product": "Cards", "country": "Turkey", "meta": "COND", "x": "COND", "google": "COND", "tg": "YES", "n_meta": "COND with framing", "n_x": "Turkey on allowed list for crypto cards → COND with licence", "n_google": "Turkey allowed with cert. | COND — certification/registration required per Google Ads crypto policy", "n_tg": "", "n_gen": ""}, {"product": "Cards", "country": "Argentina", "meta": "COND", "x": "COND", "google": "COND", "tg": "YES", "n_meta": "AR not in accepted licence list → COND with careful framing (no financial claims)", "n_x": "AR on allowed list for crypto cards → COND;", "n_google": "AR approved, needs cert. | COND — certification/registration required per Google Ads crypto policy", "n_tg": "", "n_gen": ""}, {"product": "Cards", "country": "Brazil", "meta": "COND", "x": "COND", "google": "COND", "tg": "YES", "n_meta": "BR not in accepted licence list → COND", "n_x": "BR on allowed list → COND; no banking terms, no BRL", "n_google": "BR approved, needs cert. | COND — certification/registration required per Google Ads crypto policy", "n_tg": "", "n_gen": ""}, {"product": "Cards", "country": "MENA", "meta": "COND", "x": "COND", "google": "COND", "tg": "YES", "n_meta": "UAE has accepted licence; other MENA COND", "n_x": "UAE on allowed list", "n_google": "UAE approved. 'Spend crypto globally' framing. | COND — certification/registration required per Google Ads crypto policy", "n_tg": "", "n_gen": ""}, {"product": "Cards", "country": "Germany", "meta": "NO", "x": "NO", "google": "NO", "tg": "NO", "n_meta": "DE not in accepted licence list for crypto debit cards → NO", "n_x": "DE on allowed list for crypto debit cards WITH licence → COND (need BaFin)", "n_google": "EU CASP required → NO without CASP", "n_tg": "spending framing, EN", "n_gen": ""}, {"product": "Cards", "country": "Austria", "meta": "COND", "x": "COND", "google": "NO", "tg": "COND", "n_meta": "FMA licence accepted → COND (if FMA held)", "n_x": "AT on allowed list for crypto cards WITH licence → COND (need FMA)", "n_google": "EU CASP needed → NO", "n_tg": "spending framing, EN", "n_gen": ""}, {"product": "Cards", "country": "Switzerland", "meta": "COND", "x": "COND", "google": "COND", "tg": "COND", "n_meta": "FINMA licence → COND (if FINMA held)", "n_x": "CH on allowed list for crypto cards WITH licence → COND", "n_google": "FINMA + cert needed → COND", "n_tg": "COND", "n_gen": ""}, {"product": "Cards", "country": "Netherlands", "meta": "COND", "x": "COND", "google": "NO", "tg": "COND", "n_meta": "DNB registration → COND (if DNB held)", "n_x": "NL on allowed list WITH DNB licence → COND. No NL language", "n_google": "EU CASP needed → NO", "n_tg": "COND, EN only", "n_gen": ""}, {"product": "OnLock", "country": "Argentina", "meta": "NO", "x": "COND", "google": "NO", "tg": "YES", "n_meta": "lending needs prior permission + licence; AR not in accepted list → NO", "n_x": "AR on list, lending COND with licence", "n_google": "'crypto loans' = GLOBALLY PROHIBITED category", "n_tg": "'digital liquidity' framing, no 'loan'", "n_gen": ""}, {"product": "OnLock", "country": "Brazil", "meta": "NO", "x": "COND", "google": "NO", "tg": "YES", "n_meta": "BR not in licence list for lending → NO", "n_x": "BR on list → COND; no 'empréstimo'", "n_google": "crypto loans = GLOBALLY PROHIBITED", "n_tg": "'ativação de valor' framing", "n_gen": ""}, {"product": "OnLock", "country": "Germany", "meta": "NO", "x": "NO", "google": "NO", "tg": "NO", "n_meta": "DE not in licence list + lending product → NO", "n_x": "regulated lending without BaFin = NO (DE on list but licence required)", "n_google": "crypto loans GLOBALLY PROHIBITED", "n_tg": "legal doc says NO — regulated service, no direct promotion", "n_gen": ""}, {"product": "OnLock", "country": "Austria", "meta": "NO", "x": "NO", "google": "NO", "tg": "NO", "n_meta": "lending needs FMA licence; FMA accepted by Meta but OnLock as 'loan' = NO without licence", "n_x": "regulated lending without FMA = NO", "n_google": "crypto loans PROHIBITED", "n_tg": "same as DE", "n_gen": ""}, {"product": "OnLock", "country": "Switzerland", "meta": "NO", "x": "NO", "google": "NO", "tg": "NO", "n_meta": "FINMA accepted but lending product without FINMA → NO", "n_x": "regulated lending without FINMA = NO", "n_google": "crypto loans PROHIBITED", "n_tg": "NO direct promotion", "n_gen": ""}, {"product": "OnLock", "country": "Netherlands", "meta": "NO", "x": "NO", "google": "NO", "tg": "NO", "n_meta": "DNB accepted but lending without DNB → NO", "n_x": "regulated lending without DNB = NO", "n_google": "crypto loans PROHIBITED", "n_tg": "NO direct promotion", "n_gen": ""}, {"product": "Exchange", "country": "Russia", "meta": "NO", "x": "NO", "google": "NO", "tg": "YES", "n_meta": "blocked", "n_x": "Russia EXCLUDED from crypto ads per X policy (*)", "n_google": "suspended", "n_tg": "tech framing, core market", "n_gen": ""}, {"product": "Exchange", "country": "Kazakhstan", "meta": "COND", "x": "NO", "google": "NO", "tg": "YES", "n_meta": "KZ not in accepted list → COND with care", "n_x": "Kazakhstan not in X allowed-country list for regulated crypto exchange advertising per X Financial Services policy", "n_google": "No source confirms Kazakhstan is in Google's approved country list for crypto exchange certification. Cannot support COND", "n_tg": "core CIS market", "n_gen": ""}, {"product": "Exchange", "country": "Turkey", "meta": "COND", "x": "COND", "google": "COND", "tg": "YES", "n_meta": "COND with framing", "n_x": "Turkey on allowed list for exchanges WITH licence → COND", "n_google": "Turkey approved, needs cert. | COND — certification/registration required per Google Ads crypto policy", "n_tg": "", "n_gen": ""}, {"product": "Exchange", "country": "Argentina", "meta": "COND", "x": "COND", "google": "COND", "tg": "YES", "n_meta": "AR not in accepted list → COND (risky)", "n_x": "AR on allowed list WITH licence → COND", "n_google": "AR approved, needs cert. | COND — no direct AR geo; neutral LatAm framing; Google certification required", "n_tg": "", "n_gen": ""}, {"product": "Exchange", "country": "Brazil", "meta": "COND", "x": "COND", "google": "COND", "tg": "YES", "n_meta": "BR not in accepted list → COND (risky)", "n_x": "BR on allowed list → COND", "n_google": "BR approved, needs cert. | COND — no direct BR targeting; no localized Portuguese; conditional framing required", "n_tg": "", "n_gen": ""}, {"product": "Exchange", "country": "Germany", "meta": "NO", "x": "NO", "google": "NO", "tg": "NO", "n_meta": "DE not in accepted licence list for exchanges → NO", "n_x": "DE on allowed list but requires BaFin/CASP licence → NO without it", "n_google": "EU CASP required (MiCA, Apr 2025) → NO", "n_tg": "Without BaFin/CASP, active Telegram ad targeting of DE residents is not permitted per legal doc", "n_gen": ""}, {"product": "Exchange", "country": "Austria", "meta": "NO", "x": "NO", "google": "NO", "tg": "NO", "n_meta": "No CASP or FMA licence held. Meta requires a recognised licence for financial crypto products. Active promotion of Exchange to AT residents is not acceptable under the legal document", "n_x": "AT on allowed list but requires FMA licence → NO without FMA", "n_google": "EU CASP needed → NO", "n_tg": "Without CASP/FMA, active Telegram ad targeting of AT residents is not permitted per legal doc. Telegram Ads are ads", "n_gen": ""}, {"product": "Exchange", "country": "Switzerland", "meta": "COND", "x": "NO", "google": "COND", "tg": "COND", "n_meta": "FINMA licence → COND (if FINMA)", "n_x": "CH on allowed list but requires FINMA → NO without FINMA", "n_google": "FINMA + Google cert needed → COND (possible)", "n_tg": "tech framing", "n_gen": ""}, {"product": "Exchange", "country": "Netherlands", "meta": "COND", "x": "NO", "google": "NO", "tg": "COND", "n_meta": "DNB registration accepted → COND (if DNB held)", "n_x": "NL on allowed list but requires DNB registration → NO without DNB. No NL language", "n_google": "EU CASP needed → NO", "n_tg": "", "n_gen": ""}, {"product": "Wallet", "country": "Russia", "meta": "NO", "x": "NO", "google": "NO", "tg": "YES", "n_meta": "blocked", "n_x": "Russia excluded", "n_google": "suspended", "n_tg": "'secure multi-currency wallet', tech framing; RF Ad Law applies", "n_gen": ""}, {"product": "Wallet", "country": "Kazakhstan", "meta": "COND", "x": "NO", "google": "NO", "tg": "YES", "n_meta": "COND (KZ not in accepted list for wallets with services)", "n_x": "Kazakhstan not in X allowed-country list for regulated crypto wallet advertising per X Financial Services policy", "n_google": "No source confirms Kazakhstan is in Google's approved country list for software wallet certification. Cannot support COND", "n_tg": "", "n_gen": ""}, {"product": "Wallet", "country": "Turkey", "meta": "COND", "x": "COND", "google": "COND", "tg": "YES", "n_meta": "COND", "n_x": "Turkey on list WITH licence → COND", "n_google": "Turkey approved. | COND — certification/registration required per Google Ads crypto policy", "n_tg": "", "n_gen": ""}, {"product": "Wallet", "country": "Argentina", "meta": "COND", "x": "COND", "google": "COND", "tg": "YES", "n_meta": "AR not in accepted list → COND (risky)", "n_x": "AR on allowed list → COND;, bridge if fiat", "n_google": "AR approved, needs cert. | COND — no fiat/P2P licence for AR; no direct AR targeting; bridge landing required where fiat mentioned", "n_tg": "", "n_gen": ""}, {"product": "Wallet", "country": "Brazil", "meta": "COND", "x": "COND", "google": "COND", "tg": "YES", "n_meta": "BR not in accepted list → COND (risky)", "n_x": "BR on list → COND", "n_google": "BR approved, needs cert. | COND — certification/registration required per Google Ads crypto policy", "n_tg": "", "n_gen": ""}, {"product": "Wallet", "country": "MENA", "meta": "COND", "x": "COND", "google": "COND", "tg": "YES", "n_meta": "UAE accepted", "n_x": "UAE on list", "n_google": "COND — certification/registration required per Google Ads crypto policy", "n_tg": "", "n_gen": "'Secure multi-currency wallet'; no financial guarantees"}, {"product": "Wallet", "country": "Germany", "meta": "NO", "x": "NO", "google": "NO", "tg": "NO", "n_meta": "DE not in accepted licence list for wallets with services → NO", "n_x": "DE on list but wallet services need BaFin/CASP → NO without licence", "n_google": "EU CASP needed → NO", "n_tg": "tech framing, EN only", "n_gen": ""}, {"product": "Wallet", "country": "Austria", "meta": "NO", "x": "NO", "google": "NO", "tg": "NO", "n_meta": "EMCD has no FMA licence and no CASP/EMI. Cannot set Austria as a target or use German-language creatives. Active Meta promotion of Wallet to AT residents is not acceptable under the legal document", "n_x": "AT on list but wallet services need FMA → NO without it", "n_google": "EU CASP needed → NO", "n_tg": "Same legal restriction as Meta. Without FMA/CASP, active Telegram ad targeting of AT residents for Wallet is not permitted. Telegram Ads = active ads. Telegram platform rules do not override EMCD legal restrictions", "n_gen": ""}, {"product": "Wallet", "country": "Switzerland", "meta": "COND", "x": "NO", "google": "COND", "tg": "COND", "n_meta": "FINMA → COND (if FINMA)", "n_x": "CH on list but needs FINMA → NO without FINMA", "n_google": "FINMA + cert needed → COND", "n_tg": "COND", "n_gen": ""}, {"product": "Wallet", "country": "Netherlands", "meta": "COND", "x": "NO", "google": "NO", "tg": "COND", "n_meta": "DNB accepted → COND (if DNB held)", "n_x": "NL on list but needs DNB → NO without it. No NL language", "n_google": "EU CASP needed → NO", "n_tg": "", "n_gen": ""}, {"product": "Staking", "country": "Russia", "meta": "NO", "x": "NO", "google": "NO", "tg": "COND", "n_meta": "blocked", "n_x": "Russia excluded", "n_google": "suspended", "n_tg": "COND — 'variable rewards', no guaranteed yield, risk disclaimers", "n_gen": ""}, {"product": "Staking", "country": "Kazakhstan", "meta": "COND", "x": "NO", "google": "COND", "tg": "COND", "n_meta": "", "n_x": "Kazakhstan not in X allowed-country list for regulated staking product advertising per X Financial Services policy", "n_google": "", "n_tg": "", "n_gen": "'Variable rewards'; no guaranteed APY. Conditional language on all platforms. Legal doc: soft promotion allowed in CIS"}, {"product": "Staking", "country": "Turkey", "meta": "COND", "x": "COND", "google": "COND", "tg": "COND", "n_meta": "", "n_x": "", "n_google": "", "n_tg": "", "n_gen": "'Variable staking rewards'; no guaranteed yield. Conditional language"}, {"product": "Staking", "country": "Argentina", "meta": "NO", "x": "COND", "google": "COND", "tg": "COND", "n_meta": "staking product needs licence; AR not in accepted list → NO", "n_x": "AR on list → COND; no APY/ROI", "n_google": "COND; target LATAM, no APY", "n_tg": "COND", "n_gen": ""}, {"product": "Staking", "country": "Brazil", "meta": "NO", "x": "COND", "google": "COND", "tg": "COND", "n_meta": "staking needs licence; BR not in accepted list → NO", "n_x": "BR on list → COND", "n_google": "COND", "n_tg": "COND", "n_gen": ""}, {"product": "Staking", "country": "Germany", "meta": "NO", "x": "NO", "google": "NO", "tg": "NO", "n_meta": "DE not in list → NO", "n_x": "staking needs BaFin/CASP → NO without it", "n_google": "EU CASP required → NO", "n_tg": "NO product promo", "n_gen": "Legal doc explicit: '❌ Google/Meta/TikTok Ads for DE — not run at all'"}, {"product": "Staking", "country": "Austria", "meta": "NO", "x": "NO", "google": "NO", "tg": "NO", "n_meta": "FMA accepted but staking = investment product without licence → NO", "n_x": "AT on list but staking needs FMA → NO", "n_google": "EU CASP → NO", "n_tg": "NO product promo", "n_gen": "Same as DE (FMA)"}, {"product": "Staking", "country": "Switzerland", "meta": "NO", "x": "NO", "google": "NO", "tg": "NO", "n_meta": "staking without FINMA → NO", "n_x": "CH on list but needs FINMA for staking → NO", "n_google": "FINMA + cert needed → NO", "n_tg": "NO direct promotion", "n_gen": "No FINMA"}, {"product": "Staking", "country": "Netherlands", "meta": "NO", "x": "NO", "google": "NO", "tg": "NO", "n_meta": "staking without DNB → NO", "n_x": "NL on list but staking needs DNB → NO", "n_google": "EU CASP → NO", "n_tg": "NO product promo", "n_gen": "No DNB/CASP"}, {"product": "Staking", "country": "USA / Canada", "meta": "NO", "x": "NO", "google": "NO", "tg": "NO", "n_meta": "", "n_x": "", "n_google": "", "n_tg": "", "n_gen": "SEC/CSA: staking = unregistered securities. DO NOT ADVERTISE on any platform"}, {"product": "Staking", "country": "UK", "meta": "NO", "x": "NO", "google": "NO", "tg": "NO", "n_meta": "", "n_x": "", "n_google": "", "n_tg": "", "n_gen": "FCA: financial promotion must be approved by FCA-authorised firm. Not held. DO NOT ADVERTISE"}, {"product": "Staking", "country": "UAE", "meta": "NO", "x": "NO", "google": "NO", "tg": "NO", "n_meta": "", "n_x": "", "n_google": "", "n_tg": "", "n_gen": "VARA/ADGM: staking requires specific custody licence. Not held. DO NOT ADVERTISE"}, {"product": "Indesk", "country": "Argentina", "meta": "NO", "x": "COND", "google": "NO", "tg": "COND", "n_meta": "investment aggregator = prohibited without asset manager licence → NO", "n_x": "AR on list → COND (educational only, no direct offer)", "n_google": "crypto investment aggregators GLOBALLY PROHIBITED", "n_tg": "educational only", "n_gen": ""}, {"product": "Indesk", "country": "Brazil", "meta": "NO", "x": "COND", "google": "NO", "tg": "COND", "n_meta": "NO without CVM licence", "n_x": "COND educational only", "n_google": "PROHIBITED", "n_tg": "educational only", "n_gen": ""}, {"product": "Indesk", "country": "Germany", "meta": "NO", "x": "NO", "google": "NO", "tg": "NO", "n_meta": "NO (no BaFin investment licence)", "n_x": "managed index = Wertpapier; without BaFin = NO", "n_google": "PROHIBITED", "n_tg": "NO product offer", "n_gen": ""}, {"product": "Indesk", "country": "Austria", "meta": "NO", "x": "NO", "google": "NO", "tg": "NO", "n_meta": "NO", "n_x": "index = Investmentfonds; FMA required but no licence → NO", "n_google": "PROHIBITED", "n_tg": "NO", "n_gen": ""}, {"product": "Indesk", "country": "Switzerland", "meta": "NO", "x": "NO", "google": "NO", "tg": "NO", "n_meta": "NO", "n_x": "FINMA fund licence required → NO without it", "n_google": "PROHIBITED", "n_tg": "NO", "n_gen": ""}, {"product": "Indesk", "country": "Netherlands", "meta": "NO", "x": "NO", "google": "NO", "tg": "NO", "n_meta": "NO", "n_x": "CIS category; AFM licence required → NO", "n_google": "PROHIBITED", "n_tg": "NO", "n_gen": ""}, {"product": "P2P", "country": "Russia", "meta": "NO", "x": "NO", "google": "NO", "tg": "YES", "n_meta": "blocked", "n_x": "Russia EXCLUDED", "n_google": "suspended", "n_tg": "core CIS market; tech framing", "n_gen": ""}, {"product": "P2P", "country": "Kazakhstan", "meta": "COND", "x": "not covered in source documents", "google": "not covered in source documents", "tg": "YES", "n_meta": "KZ not in accepted list → COND", "n_x": "Kazakhstan not in X allowed-country list for regulated crypto products. No source supports a COND status", "n_google": "No source confirms Kazakhstan is in Google's approved country list for P2P crypto service advertising. Cannot support COND", "n_tg": "core market", "n_gen": "Core CIS market"}, {"product": "P2P", "country": "Turkey", "meta": "COND", "x": "COND", "google": "COND", "tg": "YES", "n_meta": "COND", "n_x": "Turkey on allowed list → COND", "n_google": "Turkey approved. | COND — certification/registration required per Google Ads crypto policy", "n_tg": "", "n_gen": "Core market"}, {"product": "P2P", "country": "Argentina", "meta": "COND", "x": "COND", "google": "COND", "tg": "YES", "n_meta": "AR not in accepted list → COND (risky)", "n_x": "AR on list → COND;", "n_google": "AR approved, needs cert. | COND — certification/registration required per Google Ads crypto policy", "n_tg": "", "n_gen": ""}, {"product": "P2P", "country": "Brazil", "meta": "COND", "x": "COND", "google": "COND", "tg": "YES", "n_meta": "BR not in accepted list → COND (risky)", "n_x": "BR on list → COND", "n_google": "BR approved. | COND — certification/registration required per Google Ads crypto policy", "n_tg": "", "n_gen": ""}, {"product": "On/Off Ramp", "country": "Russia", "meta": "NO", "x": "NO", "google": "NO", "tg": "YES", "n_meta": "blocked", "n_x": "Russia excluded", "n_google": "suspended", "n_tg": "xForta/Paylama RUB providers; 'buy crypto with RUB'; RF Ad Law applies", "n_gen": ""}, {"product": "On/Off Ramp", "country": "Kazakhstan", "meta": "COND", "x": "not covered in source documents", "google": "not covered in source documents", "tg": "YES", "n_meta": "COND", "n_x": "Kazakhstan not in X allowed-country list for regulated crypto products. No source supports a COND status", "n_google": "No source confirms Kazakhstan is in Google's approved country list for crypto on/off ramp advertising. Cannot support COND", "n_tg": "", "n_gen": ""}, {"product": "On/Off Ramp", "country": "Turkey", "meta": "COND", "x": "COND", "google": "COND", "tg": "YES", "n_meta": "COND", "n_x": "Turkey on list → COND", "n_google": "approved. 'buy/sell crypto easily'. | COND — certification/registration required per Google Ads crypto policy", "n_tg": "", "n_gen": ""}, {"product": "On/Off Ramp", "country": "Argentina", "meta": "COND", "x": "COND", "google": "COND", "tg": "YES", "n_meta": "COND (risky)", "n_x": "AR on list → COND;, no 'fiat for all'", "n_google": "AR approved, needs cert. | COND — certification/registration required per Google Ads crypto policy", "n_tg": "", "n_gen": ""}, {"product": "On/Off Ramp", "country": "Brazil", "meta": "COND", "x": "COND", "google": "COND", "tg": "YES", "n_meta": "COND (risky)", "n_x": "BR on list → COND", "n_google": "BR approved. Bridge landing for fiat. | COND — certification/registration required per Google Ads crypto policy", "n_tg": "", "n_gen": ""}, {"product": "On/Off Ramp", "country": "MENA", "meta": "COND", "x": "COND", "google": "COND", "tg": "YES", "n_meta": "UAE accepted", "n_x": "UAE on list", "n_google": "UAE approved. | COND — certification/registration required per Google Ads crypto policy", "n_tg": "", "n_gen": "Mercuryo global provider"}, {"product": "On/Off Ramp", "country": "Germany", "meta": "NO", "x": "NO", "google": "NO", "tg": "NO", "n_meta": "DE not in accepted list for payment/exchange services → NO", "n_x": "DE on list but BaFin/EMI licence required → NO without it", "n_google": "EU CASP needed → NO", "n_tg": "EN, tech framing only", "n_gen": ""}, {"product": "On/Off Ramp", "country": "Austria", "meta": "COND", "x": "NO", "google": "NO", "tg": "COND", "n_meta": "FMA accepted → COND (if FMA held)", "n_x": "AT on list but FMA needed → NO without FMA", "n_google": "EU CASP → NO", "n_tg": "tech framing", "n_gen": ""}, {"product": "On/Off Ramp", "country": "Switzerland", "meta": "COND", "x": "NO", "google": "COND", "tg": "COND", "n_meta": "FINMA → COND", "n_x": "CH on list but FINMA needed → NO", "n_google": "FINMA + cert → COND", "n_tg": "COND", "n_gen": ""}, {"product": "On/Off Ramp", "country": "Netherlands", "meta": "COND", "x": "NO", "google": "NO", "tg": "COND", "n_meta": "DNB accepted → COND (if DNB)", "n_x": "NL on list but DNB needed → NO. No NL language", "n_google": "EU CASP → NO", "n_tg": "", "n_gen": ""}];
+
+const KEY_RULES = [
+  { section: '📌  META — HOW IT ACTUALLY WORKS' },
+  { key: 'Products needing prior written permission', val: 'Crypto exchanges, trading platforms, lending/borrowing, wallets with buy/sell/swap/staking, mining hardware/software. These require PRIOR WRITTEN PERMISSION + one of 27 recognised licences.' },
+  { key: 'Products NOT needing permission', val: 'Educational/news content, blockchain events, NFTs, storage-only wallets (no trading/staking services). → These are YES everywhere Meta operates.' },
+  { key: 'Germany — Meta', val: "Germany (BaFin) is NOT in Meta's list of 27 accepted regulatory licences. EMCD cannot get Meta approval for financial products targeting DE. → NO for exchanges, wallets with services, lending, staking." },
+  { key: 'Austria — Meta', val: "FMA IS in Meta's accepted licence list — but EMCD does not hold an FMA licence. Active Meta promotion of Exchange-type or other financial crypto products targeting Austrian residents is NOT acceptable. Treated as NO, not COND." },
+  { key: 'Netherlands — Meta', val: "DNB (Dutch Central Bank) registration IS in Meta's accepted licence list. → COND only if DNB registration is held. EMCD does not currently hold it." },
+  { key: 'Switzerland — Meta', val: "FINMA licence IS in Meta's accepted licence list. → COND only if FINMA is held." },
+  { key: 'Argentina / Brazil — Meta', val: "Not in Meta's accepted licence list for financial crypto products. Exchanges/wallets/lending = high ban risk → NO or COND depending on product." },
+  { section: '📌  X (TWITTER) — HOW IT ACTUALLY WORKS' },
+  { key: 'Russia — X', val: 'Russia is EXCLUDED (*) from all crypto and DeFi advertising on X per its official financial services policy. → Always NO.' },
+  { key: 'Crypto products WITH licence', val: 'Exchanges, wallets, crypto debit/credit cards, staking, CFDs — all allowed WITH country-specific licensing. DE, AT, NL, CH, AR, BR, TR, UAE, UK, US, CA, etc. are on the allowed list.' },
+  { key: 'Mining hardware/software — X', val: "PROHIBITED globally on X regardless of licence. 'Cryptocurrency mining including hardware and software services associated with mining' = always NO. Mining pool software falls under this prohibition." },
+  { key: 'Without licence — X', val: 'Financial crypto products without the required country-specific licence = NO on X, even if the country is on the allowed list.' },
+  { key: 'Educational content — X', val: 'Smart contracts and educational content about blockchain/crypto/DeFi is permitted WITHOUT licensing requirements. → YES in all non-excluded countries.' },
+  { section: '📌  GOOGLE ADS — HOW IT ACTUALLY WORKS' },
+  { key: 'EU (DE, AT, NL + all 27 EU members)', val: 'Since April 23, 2025: crypto exchanges and software wallets must have CASP licence under MiCA + Google certification. EMCD does not hold CASP → NO for financial products across the entire EU.' },
+  { key: 'Switzerland — Google', val: 'Not EU but FINMA + Google certification required for exchanges/wallets. EMCD does not hold FINMA → NO without it.' },
+  { key: 'Globally prohibited on Google', val: 'ICOs, DeFi trading protocols, crypto loans/lending, token liquidity pools, unregulated DApps, crypto investment aggregators. → OnLock (lending) and Indesk (investment aggregator) = PROHIBITED on Google globally.' },
+  { key: 'Argentina / Brazil — Google', val: "Both on Google's approved country list. With Google certification = COND. Educational/brand content requires no certification → YES." },
+  { section: '📌  TELEGRAM ADS — HOW IT ACTUALLY WORKS' },
+  { key: 'Telegram Ads policy', val: 'Prohibits: guaranteed returns, pyramid schemes, get-rich-quick, predatory loans, misleading financial claims. Does NOT apply country-level crypto blocks for legitimate platforms.' },
+  { key: 'Russia on Telegram', val: 'Telegram unblocked in Russia since 2020. Primary CIS channel. Allowed for all products with RF Ad Law compliance (no superlatives, no guaranteed returns, age rating if URL shown).' },
+  { key: 'EU on Telegram', val: "Telegram platform has no country-level crypto blocks. However EMCD's legal document restricts active Telegram advertising to EU residents for financial products — Telegram Ads are ads. Exchange/Germany and Exchange/Austria = NO. Other EU-country cells may be COND where legal doc allows brand/tech framing without a direct financial product offer." },
+  { section: '📋  UNIVERSAL RULES' },
+  { key: 'No guaranteed returns', val: 'Never promise fixed income, guaranteed APY, ROI, or guaranteed yield on any platform.' },
+  { key: 'No banking terminology', val: 'Avoid: loan, credit, deposit, guaranteed interest, passive income, bank alternative, empréstimo, plazo fijo, renda fixa.' },
+  { key: 'No deepfakes; no 3rd-party IP', val: 'Prohibited globally. No characters < 70 years old without licence. No 3rd-party IP or trademarked cultural symbols.' },
+  { key: 'Argentina Spanish', val: "Do NOT use vos / shushing / 'che' = constitutes AR geo-targeting. Use neutral LATAM Spanish. No ARS banknotes." },
+  { key: 'Brazil Portuguese', val: "No 'empréstimo'. Use 'ativação de valor'. Subjuntivo futuro always." },
+  { key: 'EU language rule (MiCA)', val: 'Using German/Dutch/French/Finnish in creatives = direct targeting of EU residents = PROHIBITED without CASP.' },
+  { key: 'Legal approval (Jira)', val: "All banners and landings → Jira, project LEGAL, 'Marketing materials check'. One task per creative." },
+];
+
+const PLATFORMS = {
+  meta:   { label: 'Meta',        icon: 'f', field: 'meta',   noteField: 'n_meta',   color: 'meta',   hex: '#1877f2', emoji: '📘' },
+  x:      { label: 'X (Twitter)', icon: '𝕏', field: 'x',     noteField: 'n_x',     color: 'x',      hex: '#e7e7e7', emoji: '🐦' },
+  google: { label: 'Google Ads',  icon: 'G', field: 'google', noteField: 'n_google', color: 'google', hex: '#ea4335', emoji: '🔍' },
+  tg:     { label: 'Telegram Ads',icon: '✈', field: 'tg',    noteField: 'n_tg',    color: 'tg',     hex: '#26a5e4', emoji: '✈️' },
+};
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+function badgeClass(v) {
+  if (!v) return 'ncov';
+  const u = v.trim().toUpperCase();
+  if (u === 'YES') return 'YES';
+  if (u === 'NO')  return 'NO';
+  if (u === 'COND') return 'COND';
+  return 'ncov';
+}
+
+function badgeLabel(v) {
+  if (!v) return '—';
+  const u = v.trim().toUpperCase();
+  if (u === 'YES' || u === 'NO' || u === 'COND') return u;
+  if (v.toLowerCase().includes('not covered')) return 'N/A';
+  return v.length > 6 ? v.slice(0,6)+'…' : v;
+}
+
+function esc(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ── Build Key Rules ───────────────────────────────────────────────────────────
+function buildRules() {
+  const el = document.getElementById('rules-container');
+  let html = '<div class="rules-grid">';
+  KEY_RULES.forEach(r => {
+    if (r.section) {
+      html += `<div class="rules-section-header">${esc(r.section)}</div>`;
+    } else {
+      html += `<div class="rule-card">
+        <div class="rule-key">${esc(r.key)}</div>
+        <div class="rule-val">${esc(r.val)}</div>
+      </div>`;
+    }
+  });
+  html += '</div>';
+  el.innerHTML = html;
+}
+
+// ── Build platform page ───────────────────────────────────────────────────────
+function buildPlatformPage(pid) {
+  const p = PLATFORMS[pid];
+  const el = document.getElementById('page-' + pid);
+  if (el.dataset.built) return;
+  el.dataset.built = '1';
+
+  // Group data by product
+  const byProduct = {};
+  DATA.forEach(row => {
+    if (!byProduct[row.product]) byProduct[row.product] = [];
+    byProduct[row.product].push(row);
+  });
+
+  const products = Object.keys(byProduct);
+
+  // Stat counts for filter
+  const allStatuses = [...new Set(DATA.map(r => {
+    const v = r[p.field];
+    return badgeClass(v);
+  }))];
+
+  let html = `
+  <div class="page-header">
+    <div class="page-eyebrow">Platform Compliance</div>
+    <div class="page-title platform-name ${p.color}">${esc(p.label)}</div>
+    <div class="page-sub">Compliance status per product and country · April 2026</div>
+  </div>
+  <div class="content">
+
+  <div class="filters" id="filters-${pid}">
+    <button class="filter-btn active" onclick="filterPlatform('${pid}','ALL',this)">All products</button>
+    ${products.map(pr => `<button class="filter-btn" onclick="filterPlatform('${pid}',${JSON.stringify(pr)},this)">${esc(pr)}</button>`).join('')}
+  </div>
+
+  <div id="products-${pid}">
+  `;
+
+  products.forEach(prodName => {
+    const rows = byProduct[prodName];
+    const counts = { YES: 0, NO: 0, COND: 0, ncov: 0 };
+    rows.forEach(r => {
+      const v = r[p.field] || '';
+      if (v.toLowerCase().includes('not covered')) return;
+      const bc = badgeClass(v); counts[bc] = (counts[bc]||0)+1;
+    });
+
+    html += `<div class="product-block" id="pb-${pid}-${prodName.replace(/\W/g,'_')}" data-prod="${esc(prodName)}">
+      <div class="product-header" onclick="toggleProduct(this.parentElement)">
+        <div class="product-header-left">
+          <span class="product-name">${esc(prodName)}</span>
+          <div class="product-stats">
+            ${counts.YES  ? `<span class="stat-pill yes">${counts.YES} YES</span>` : ''}
+            ${counts.COND ? `<span class="stat-pill cond">${counts.COND} COND</span>` : ''}
+            ${counts.NO   ? `<span class="stat-pill no">${counts.NO} NO</span>` : ''}
+            ${counts.ncov ? `<span class="stat-pill ncov">${counts.ncov} N/A</span>` : ''}
+          </div>
+        </div>
+        <span class="product-chevron">▼</span>
+      </div>
+      <div class="product-body">
+        <table class="country-table">
+          <thead>
+            <tr>
+              <th>Country</th>
+              <th>Status</th>
+              <th>Note</th>
+            </tr>
+          </thead>
+          <tbody>`;
+
+    rows.forEach(row => {
+      const status = row[p.field] || '';
+      // Skip rows where this platform's status is not covered in source documents
+      if (status.toLowerCase().includes('not covered')) return;
+      const note = row[p.noteField] || '';
+      const gen  = row['n_gen'] || '';
+      const bc = badgeClass(status);
+      const bl = badgeLabel(status);
+      const displayNote = note || ((!note && gen) ? gen : '');
+      const isGeneral = !note && gen;
+
+      html += `<tr>
+        <td><span class="country-name">${esc(row.country)}</span></td>
+        <td><span class="status-badge ${bc}">${bl}</span></td>
+        <td>
+          ${displayNote ? `<span class="note-text${isGeneral ? ' note-gen' : ''}">${esc(displayNote)}</span>` : '<span style="color:var(--muted);font-size:11px">—</span>'}
+        </td>
+      </tr>`;
+    });
+
+    html += `</tbody></table></div></div>`;
+  });
+
+  html += `</div></div>`;
+  el.innerHTML = html;
+}
+
+// ── Build home overview ───────────────────────────────────────────────────────
+function buildHome() {
+  buildRules();
+}
+
+// ── Navigation ────────────────────────────────────────────────────────────────
+function showPage(pid, navEl) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + pid).classList.add('active');
+  if (navEl) navEl.classList.add('active');
+
+  if (pid !== 'home') buildPlatformPage(pid);
+}
+
+function toggleProduct(block) {
+  block.classList.toggle('open');
+}
+
+function filterPlatform(pid, prodName, btn) {
+  document.querySelectorAll(`#filters-${pid} .filter-btn`).forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll(`#products-${pid} .product-block`).forEach(pb => {
+    if (prodName === 'ALL' || pb.dataset.prod === prodName) {
+      pb.style.display = '';
+      if (prodName !== 'ALL') pb.classList.add('open');
+    } else {
+      pb.style.display = 'none';
+    }
+  });
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+buildHome();
+</script>
+</body>
+</html>
